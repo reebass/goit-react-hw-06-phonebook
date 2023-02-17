@@ -11,6 +11,11 @@ import {
   Button,
   InputNumber,
 } from './ContactForm.styled';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from 'redux/contactsSlice';
+import { getContacts } from 'redux/selectors';
+
+
 
 
 let schema = yup.object().shape({
@@ -48,19 +53,23 @@ const phoneMask = [
   /\d/,
 ];
 
-export const ContactForm = ({ onSubmit, contacts }) => {
+export const ContactForm = ({onClose}) => {
+
+  const arrContacts = useSelector(getContacts);
+  const dispatch = useDispatch()
   const handleSubmit = (values, { resetForm }) => {
-    const { name } = values;
+      const { name } = values;
     if (
-      contacts.some(
+      arrContacts.some(
         contact => name.toLowerCase() === contact.name.toLowerCase()
       )
     ) {
       alert(`${name} is already in contacts`);
       return;
     }
-    onSubmit(values);
+    dispatch(addContact(values))
     resetForm();
+    onClose()
   };
 
   return (
@@ -117,12 +126,5 @@ export const ContactForm = ({ onSubmit, contacts }) => {
 
 
 ContactForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    }).isRequired
-  ),
+  onClose: PropTypes.func.isRequired,
 };
